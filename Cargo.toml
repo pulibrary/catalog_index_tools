@@ -1,0 +1,10 @@
+[package]
+name = "catalog_index_tools"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+reqwest = { version = "0.12", features = ["blocking", "json"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1" }
+rayon = { version = "1" }
