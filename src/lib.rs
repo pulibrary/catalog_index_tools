@@ -57,6 +57,7 @@ impl RecordCountComparison {
 pub struct Search {
     path: String,
     name: String,
+    client: reqwest::blocking::Client,
 }
 
 impl Search {
@@ -64,6 +65,10 @@ impl Search {
         Search {
             path: path.into(),
             name: name.into(),
+            client: reqwest::blocking::Client::builder()
+                .timeout(None)
+                .build()
+                .unwrap(),
         }
     }
 
@@ -80,7 +85,10 @@ impl Search {
     }
 
     pub fn old_count(&self) -> u32 {
-        let body = reqwest::blocking::get(self.old_url())
+        let body = self
+            .client
+            .get(self.old_url())
+            .send()
             .unwrap()
             .text()
             .unwrap();
@@ -88,7 +96,10 @@ impl Search {
     }
 
     pub fn new_count(&self) -> u32 {
-        let body = reqwest::blocking::get(self.new_url())
+        let body = self
+            .client
+            .get(self.new_url())
+            .send()
             .unwrap()
             .text()
             .unwrap();
