@@ -30,16 +30,12 @@ pub enum RecordCountComparison {
 
 impl RecordCountComparison {
     pub fn compare(old_count: u32, new_count: u32) -> RecordCountComparison {
-        if Self::is_too_big(old_count, new_count) {
-            RecordCountComparison::UnusuallyLarger
-        } else if new_count > old_count {
-            RecordCountComparison::Larger
-        } else if Self::is_too_small(old_count, new_count) {
-            RecordCountComparison::UnusuallySmaller
-        } else if new_count < old_count {
-            RecordCountComparison::Smaller
-        } else {
-            RecordCountComparison::Same
+        match (old_count, new_count) {
+            (old, new) if Self::is_too_big(old, new) => RecordCountComparison::UnusuallyLarger,
+            (old, new) if new > old => RecordCountComparison::Larger,
+            (old, new) if Self::is_too_small(old, new) => RecordCountComparison::UnusuallySmaller,
+            (old, new) if new < old => RecordCountComparison::Smaller,
+            _ => RecordCountComparison::Same,
         }
     }
 
@@ -116,6 +112,14 @@ mod tests {
     use super::*;
 
     #[test]
+    fn count_comparison_can_identify_unusually_larger() {
+        assert_eq!(
+            RecordCountComparison::compare(14_237_145, 16_270_999),
+            RecordCountComparison::UnusuallyLarger
+        );
+    }
+
+    #[test]
     fn count_comparison_can_identify_larger() {
         assert_eq!(
             RecordCountComparison::compare(16_237_145, 16_270_999),
@@ -152,6 +156,14 @@ mod tests {
         assert_eq!(
             RecordCountComparison::compare(1_719_106, 1_718_520),
             RecordCountComparison::Smaller
+        );
+    }
+
+    #[test]
+    fn count_comparison_can_identify_unusually_smaller() {
+        assert_eq!(
+            RecordCountComparison::compare(1_719_106, 1_218_520),
+            RecordCountComparison::UnusuallySmaller
         );
     }
 
